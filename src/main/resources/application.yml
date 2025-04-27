@@ -1,10 +1,24 @@
 langchain4j:
   open-ai:
     chat-model:
-      base-url: http://langchain4j.dev/demo/openai/v1
-      api-key: "demo"
+#      base-url: https://api.deepseek.com
+#      api-key: sk-98283c1fb9cb41eab54cf6fa77151873
+#      model-name: deepseek-chat
+      base-url: http://langchain4j.dev/demo/openai/v1/chat/completions
+      api-key: demo
       model-name: gpt-4o-mini
       log-requests: true
       log-responses: true
 server:
   port: 8081
+spring:
+  data:
+    mongodb:
+      database: mock-interviews
+      host: 127.0.0.1
+      port: 27017
+#      username:
+#      password:
+logging:
+  level:
+    com.jiangying: debug

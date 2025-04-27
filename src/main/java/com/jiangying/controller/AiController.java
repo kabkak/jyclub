@@ -1,21 +1,34 @@
 package com.jiangying.controller;
 
-import dev.langchain4j.model.chat.ChatLanguageModel;
-import dev.langchain4j.model.openai.OpenAiChatModel;
+
+import com.jiangying.service.mockInterviewsAssistant;
+import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
 
 @RestController("Ai")
 public class AiController {
-    private final OpenAiChatModel openAiChatModel;
 
-    public AiController(OpenAiChatModel openAiChatModel) {
-        this.openAiChatModel = openAiChatModel;
-    }
 
+    @Resource
+    mockInterviewsAssistant mockInterviewsAssistant;
 
     @GetMapping("/test")
     public String test() {
-        return openAiChatModel.chat("你好");
+        String chat = mockInterviewsAssistant.chat(1, "你好");
+        return chat;
     }
+
+    @GetMapping("/chat")
+    public String chat(@RequestParam("memoryId") int memoryId, @RequestParam("message") String message) {
+        long useId = 1;
+        //去查数据库是否有memoryId 为空则新建
+        //memoryId = UUID.randomUUID();
+
+        String chat = mockInterviewsAssistant.chat(memoryId, message);
+        return chat;
+    }
+
 }

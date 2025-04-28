@@ -35,22 +35,26 @@
             <artifactId>langchain4j-spring-boot-starter</artifactId>
             <version>1.0.0-beta3</version>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-data-mongodb</artifactId>
         </dependency>
 
-<!--        <dependency>-->
-<!--            <groupId>dev.langchain4j</groupId>-->
-<!--            <artifactId>langchain4j</artifactId>-->
-<!--            <version>1.0.0-beta3</version>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>dev.langchain4j</groupId>-->
-<!--            <artifactId>langchain4j-core</artifactId>-->
-<!--            <version>1.0.0-beta3</version> &lt;!&ndash; 请根据实际版本号调整 &ndash;&gt;-->
-<!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>dev.langchain4j</groupId>-->
+        <!--            <artifactId>langchain4j</artifactId>-->
+        <!--            <version>1.0.0-beta3</version>-->
+        <!--        </dependency>-->
+        <!--        <dependency>-->
+        <!--            <groupId>dev.langchain4j</groupId>-->
+        <!--            <artifactId>langchain4j-core</artifactId>-->
+        <!--            <version>1.0.0-beta3</version> &lt;!&ndash; 请根据实际版本号调整 &ndash;&gt;-->
+        <!--        </dependency>-->
 
     </dependencies>
     <dependencyManagement>

@@ -1,7 +1,7 @@
 package com.jiangying.controller;
 
 
-import com.jiangying.service.mockInterviewsAssistant;
+import com.jiangying.service.MockInterviewsAgent;
 import jakarta.annotation.Resource;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -13,11 +13,11 @@ public class AiController {
 
 
     @Resource
-    mockInterviewsAssistant mockInterviewsAssistant;
+    MockInterviewsAgent mockInterviewsAgent;
 
     @GetMapping("/test")
     public String test() {
-        String chat = mockInterviewsAssistant.chat(1, "你好");
+        String chat = mockInterviewsAgent.chat(1, "475695037565 的平方根是多少？");
         return chat;
     }
 
@@ -27,7 +27,7 @@ public class AiController {
         //去查数据库是否有memoryId 为空则新建
         //memoryId = UUID.randomUUID();
 
-        String chat = mockInterviewsAssistant.chat(memoryId, message);
+        String chat = mockInterviewsAgent.chat(memoryId, message);
         return chat;
     }
 

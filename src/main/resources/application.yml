@@ -4,8 +4,8 @@ langchain4j:
 #      base-url: https://api.deepseek.com
 #      api-key: sk-98283c1fb9cb41eab54cf6fa77151873
 #      model-name: deepseek-chat
-      base-url: http://langchain4j.dev/demo/openai/v1/chat/completions
-      api-key: demo
+      base-url: http://langchain4j.dev/demo/openai/v1
+      api-key: "demo"
       model-name: gpt-4o-mini
       log-requests: true
       log-responses: true

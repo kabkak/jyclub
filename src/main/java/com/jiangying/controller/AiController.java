@@ -13,6 +13,7 @@ import dev.langchain4j.model.output.Response;
 import dev.langchain4j.store.embedding.EmbeddingStore;
 import dev.langchain4j.store.embedding.EmbeddingStoreIngestor;
 import jakarta.annotation.Resource;
+
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import reactor.core.publisher.Flux;
@@ -32,6 +33,8 @@ public class AiController {
     private MockInterviewsAssistant mockInterviewsAssistant;
     @Resource
     private EmbeddingStore<TextSegment> embeddingStore;
+//    @Resource
+//    private RepositoryService repositoryService;
 
     @GetMapping("/testAi")
     public String test() {

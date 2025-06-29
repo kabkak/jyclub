@@ -10,6 +10,7 @@ langchain4j:
       model-name: gpt-4o-mini
       log-requests: true
       log-responses: true
+
 server:
   port: 8081
 spring:
@@ -23,7 +24,25 @@ spring:
     redis:
       host: 115.190.9.125
       password: redis_jiangying
+  activiti:
+    database-type: mysql
+    database-schema-update: true #自动创建数据库
+    db-history-used: true # 开启流程历史记录
+    history-level: full
+  datasource:
+    url: jdbc:mysql://115.190.9.125:3306/jyclub?useUnicode=true&characterEncoding=utf-8&useSSL=false&allowPublicKeyRetrieval=true&zeroDateTimeBehavior=convertToNull&transformedBitIsBoolean=true&allowMultiQueries=true&tinyInt1isBit=false&allowLoadLocalInfile=true&allowLocalInfile=true&allowUrlInLocalInfile=true&allowPublicKeyRetrieval=true&useSSL=false&allowPublicKeyRetrieval=true&useUnicode=true&characterEncoding=utf-8&nullCatalogMeansCurrent=true
+    username: root
+    password: mysql_jiangying
+    driver-class-name: com.mysql.cj.jdbc.Driver
+# 历史流程数据全部记录到历史表中，支持none、activity、audit、full，4种粒度的数据，常用的就是full
+  devtools:
+    restart:
+      # 设置不参与热部署的文件或文件夹
+      exclude: static/**,public/**,config/application.yml
 
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 logging:
   level:
     com.jiangying: debug

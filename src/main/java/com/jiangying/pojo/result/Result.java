@@ -17,7 +17,7 @@ public class Result<T> implements Serializable {
     private String msg; //错误信息
     private T data; //数据
 
-    private Map map = new HashMap();//动态数据
+//    private Map map = new HashMap();//动态数据
     public static <T> Result<T> success() {
         Result<T> result = new Result<T>();
         result.code = 200;
@@ -39,10 +39,10 @@ public class Result<T> implements Serializable {
     }
 
 
-    public Result<T> add(String key,Object value){
-
-        this.map.put(key,value);
-
-        return this;
-    }
+//    public Result<T> add(String key,Object value){
+//
+//        this.map.put(key,value);
+//
+//        return this;
+//    }
 }

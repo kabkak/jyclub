@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+             xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn"
+             xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+             xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+             typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath"
+             targetNamespace="http://www.activiti.org/processdef">
+
+    <process id="businessTripProcess" name="出差流程" isExecutable="true">
+        <!-- 开始事件 -->
+        <startEvent id="startEvent" name="开始出差"/>
+
+        <!-- 申请出差任务 -->
+        <userTask id="applyForTrip" name="申请出差" activiti:assignee="employee"/>
+
+        <!-- 审批出差任务 -->
+        <userTask id="approveTrip" name="审批出差" activiti:assignee="manager"/>
+
+        <!-- 执行出差任务 -->
+        <userTask id="executeTrip" name="执行出差" activiti:assignee="employee"/>
+
+        <!-- 报销出差费用 -->
+        <userTask id="reimburseTrip" name="报销费用" activiti:assignee="finance"/>
+
+        <!-- 结束事件 -->
+        <endEvent id="endEvent" name="结束出差"/>
+
+        <!-- 连接线 -->
+        <sequenceFlow sourceRef="startEvent" targetRef="applyForTrip"/>
+        <sequenceFlow sourceRef="applyForTrip" targetRef="approveTrip"/>
+        <sequenceFlow sourceRef="approveTrip" targetRef="executeTrip"/>
+        <sequenceFlow sourceRef="executeTrip" targetRef="reimburseTrip"/>
+        <sequenceFlow sourceRef="reimburseTrip" targetRef="endEvent"/>
+    </process>
+
+</definitions>

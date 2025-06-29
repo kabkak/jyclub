@@ -1,36 +1,35 @@
 package com.jiangying.controller;
 
 
-import cn.hutool.core.util.CharsetUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.RandomUtil;
-import cn.hutool.crypto.SecureUtil;
-import cn.hutool.crypto.digest.HMac;
-import cn.hutool.crypto.digest.HmacAlgorithm;
-import com.jiangying.constant.KeyConstant;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.jiangying.pojo.entity.AuthUser;
+import com.jiangying.service.AuthUserService;
 import com.jiangying.utils.ContentUtil;
 import com.jiangying.utils.MessageUtil;
 import com.jiangying.utils.SHA1;
 import jakarta.annotation.Resource;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.TimeUnit;
 
 @RestController
 @Slf4j
 public class CallBackController {
 
-    private static final String token = "kab";
+    private static final String WECHAT_TOKEN = "kab";
 
     @Resource
-    private RedisTemplate redisTemplate;
+    private StringRedisTemplate stringRedisTemplate;
 
-    @RequestMapping("/test")
-    public String test() {
-        return "hello world";
-    }
+    @Resource
+    private AuthUserService authUserService;
 
     /**
      * 回调消息校验
@@ -42,7 +41,7 @@ public class CallBackController {
                            @RequestParam("echostr") String echostr) {
         log.info("get验签请求参数：signature:{}，timestamp:{}，nonce:{}，echostr:{}",
                 signature, timestamp, nonce, echostr);
-        String shaStr = SHA1.getSHA1(token, timestamp, nonce, "");
+        String shaStr = SHA1.getSHA1(WECHAT_TOKEN, timestamp, nonce, "");
         if (signature.equals(shaStr)) {
             return echostr;
         }
@@ -62,42 +61,69 @@ public class CallBackController {
         String fromUserName = messageMap.get("FromUserName");
         String toUserName = messageMap.get("ToUserName");
         String msgType = messageMap.get("MsgType");
-        String msg = null;
-        if (msgType.equals("text")) {
-            String content = messageMap.get("Content");
-            log.info("接收到微信消息：fromUserName：{}，content：{}", fromUserName, content);
-            if (content.equals("芝麻开门")) {
-                byte[] c = RandomUtil.randomBytes(10);
-                String key = new String(c);
-                redisTemplate.opsForValue().get(key);
-                //如果有则返回请重新输出
-                if (ObjectUtil.isNotEmpty(redisTemplate.opsForValue().get(key))) {
-                    return ContentUtil.getContent(fromUserName, toUserName, "发送了未知错误");
+        String msg = "系统繁忙，请稍后再试"; // Default message
+
+        try {
+            if ("text".equals(msgType)) {
+                String content = messageMap.get("Content");
+                log.info("接收到微信文本消息：fromUserName：{}，content：{}", fromUserName, content);
+                if ("芝麻开门".equals(content)) {
+                    String key = RandomUtil.randomString(6);
+                    // 使用 StringRedisTemplate 并设置合理的过期时间
+                    stringRedisTemplate.opsForValue().set(key, fromUserName, 5, TimeUnit.MINUTES);
+                    msg = "叮咚～ 您的登录密钥是：" + key + "，5分钟内有效。";
+                } else {
+                    msg = "哎呀，你忘记暗号啦～";
                 }
-
-//                // 解密
-//                String decrypt = SecureUtil.aes(KeyConstant.AES_KEY.getBytes())
-//                        .decryptStr(encrypt, CharsetUtil.CHARSET_UTF_8);
-
-                redisTemplate.opsForValue().set(key, fromUserName, 30, java.util.concurrent.TimeUnit.SECONDS);
-                //获得6位随机验证码
-                msg = "叮咚～ 您的密钥是： " + key;
-                //保存到redis todo
-            } else {
-                msg = "哎呀，你忘记暗号啦～";
+            } else if ("event".equals(msgType)) {
+                String event = messageMap.get("Event");
+                log.info("接收到微信事件：fromUserName：{}，event：{}", fromUserName, event);
+                if ("subscribe".equals(event)) {
+                    handleSubscription(fromUserName);
+                    msg = "欢迎关注！输入 芝麻开门 获取登录密钥，开启您的学习之旅吧！";
+                } else if ("unsubscribe".equals(event)) {
+                    handleUnsubscription(fromUserName);
+                    log.info("用户 {} 已取消关注", fromUserName);
+                    // 微信要求取消订阅时返回空字符串或success
+                    return "success";
+                }
             }
-        } else if (msgType.equals("event")) {
-            String event = messageMap.get("Event");
-            if (event.equals("subscribe")) {
-                // 添加用户信息 todo
-            } else {
-                //删除用户信息 todo
-            }
-
+        } catch (Exception e) {
+            log.error("处理微信回调时发生错误", e);
         }
 
         return ContentUtil.getContent(fromUserName, toUserName, msg);
     }
 
+    private void handleSubscription(String openId) {
+        AuthUser authUser = authUserService.getOne(new LambdaQueryWrapper<AuthUser>().eq(AuthUser::getUserName, openId));
+        if (ObjectUtil.isNotNull(authUser)) {
+            // 用户重新关注，更新状态
+            authUser.setStatus(0); // 0-启用
+            authUser.setUpdateTime(LocalDateTime.now());
+            authUserService.updateById(authUser);
+            log.info("用户 {} 重新关注", openId);
+        } else {
+            // 新用户关注
+            AuthUser newUser = new AuthUser()
+                    .setUserName(openId) // 使用 OpenID 作为唯一用户名
+                    .setNickName("电科小子_" + RandomUtil.randomString(6))
+                    .setAvatar("https://tse3-mm.cn.bing.net/th/id/OIP-C.7GLMYPqMlt2LgkbPsOnDIAAAAA?rs=1&pid=ImgDetMain")
+                    .setStatus(0) // 0-启用
+                    .setIsDeleted(0)
+                    .setCreatedTime(LocalDateTime.now())
+                    .setUpdateTime(LocalDateTime.now());
+            authUserService.save(newUser);
+            log.info("新用户 {} 关注成功", openId);
+        }
+    }
 
+    private void handleUnsubscription(String openId) {
+        AuthUser authUser = authUserService.getOne(new LambdaQueryWrapper<AuthUser>().eq(AuthUser::getUserName, openId));
+        if (ObjectUtil.isNotNull(authUser)) {
+            authUser.setStatus(1); // 1-禁用
+            authUser.setUpdateTime(LocalDateTime.now());
+            authUserService.updateById(authUser);
+        }
+    }
 }

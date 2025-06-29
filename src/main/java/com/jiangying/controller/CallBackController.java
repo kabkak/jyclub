@@ -6,6 +6,10 @@ import cn.hutool.core.util.RandomUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.jiangying.pojo.entity.AuthUser;
 import com.jiangying.service.AuthUserService;
+import com.jiangying.pojo.entity.AuthRole;
+import com.jiangying.pojo.entity.AuthUserRole;
+import com.jiangying.service.AuthRoleService;
+import com.jiangying.service.AuthUserRoleService;
 import com.jiangying.utils.ContentUtil;
 import com.jiangying.utils.MessageUtil;
 import com.jiangying.utils.SHA1;
@@ -24,12 +28,19 @@ import java.util.concurrent.TimeUnit;
 public class CallBackController {
 
     private static final String WECHAT_TOKEN = "kab";
+    private static final String DEFAULT_ROLE_KEY = "common_user";
 
     @Resource
     private StringRedisTemplate stringRedisTemplate;
 
     @Resource
     private AuthUserService authUserService;
+
+    @Resource
+    private AuthRoleService authRoleService;
+
+    @Resource
+    private AuthUserRoleService authUserRoleService;
 
     /**
      * 回调消息校验
@@ -114,7 +125,20 @@ public class CallBackController {
                     .setCreatedTime(LocalDateTime.now())
                     .setUpdateTime(LocalDateTime.now());
             authUserService.save(newUser);
-            log.info("新用户 {} 关注成功", openId);
+            log.info("新用户 {} 关注成功, ID: {}", openId, newUser.getId());
+            // 分配默认角色
+            AuthRole defaultRole = authRoleService.getOne(new LambdaQueryWrapper<AuthRole>().eq(AuthRole::getRoleKey, DEFAULT_ROLE_KEY));
+            if (ObjectUtil.isNotNull(defaultRole)) {
+                AuthUserRole authUserRole = new AuthUserRole();
+                authUserRole.setUserId(newUser.getId());
+                authUserRole.setRoleId(defaultRole.getId());
+                authUserRole.setCreatedTime(LocalDateTime.now());
+                authUserRole.setUpdateTime(LocalDateTime.now());
+                authUserRoleService.save(authUserRole);
+                log.info("为新用户 {} 分配默认角色 {}", openId, defaultRole.getRoleName());
+            } else {
+                log.warn("未能找到默认角色 [{}], 请检查数据库配置", DEFAULT_ROLE_KEY);
+            }
         }
     }
 

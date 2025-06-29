@@ -385,3 +385,4 @@ CREATE TABLE `subject_radio` (
                                  `is_deleted` int(11) DEFAULT '0',
                                  PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=16 DEFAULT CHARSET=utf8 COMMENT='单选题信息表';
+INSERT INTO `auth_role` (`role_name`, `role_key`, `is_deleted`) VALUES ('普通用户', 'common_user', 0);

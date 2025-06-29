@@ -1,0 +1,33 @@
+package com.jiangying.pojo.entity;
+
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.Data;
+import lombok.experimental.Accessors;
+
+import java.io.Serializable;
+import java.time.LocalDateTime;
+
+@Data
+@Accessors(chain = true)
+@TableName("subject_info")
+public class SubjectInfo implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
+    @TableId(value = "id", type = IdType.AUTO)
+    private Long id;
+
+    private String subjectName;
+    private Integer subjectDifficult;
+    private String settleName;
+    private Integer subjectType;
+    private Integer subjectScore;
+    private String subjectParse;
+    private String createdBy;
+    private LocalDateTime createdTime;
+    private String updateBy;
+    private LocalDateTime updateTime;
+    private Integer isDeleted;
+} 

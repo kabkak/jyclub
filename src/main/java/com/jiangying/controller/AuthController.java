@@ -1,9 +1,11 @@
 package com.jiangying.controller;
 
+import cn.dev33.satoken.secure.SaSecureUtil;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.hutool.core.util.ObjectUtil;
 import cn.hutool.core.util.StrUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.jiangying.pojo.dto.AdminLoginDTO;
 import com.jiangying.pojo.dto.LoginDTO;
 import com.jiangying.pojo.entity.AuthUser;
 import com.jiangying.pojo.result.Result;
@@ -68,6 +70,59 @@ public class AuthController {
         log.info("用户 {} 登录成功, 生成的Token为: {}", authUser.getNickName(), token);
 
         // 6. 构造VO并返回
+        LoginVO loginVO = new LoginVO()
+                .setUserId(authUser.getId())
+                .setUserName(authUser.getUserName())
+                .setNickName(authUser.getNickName())
+                .setAvatar(authUser.getAvatar())
+                .setToken(token);
+
+        return Result.success(loginVO);
+    }
+
+    @PostMapping("/login/admin")
+    public Result<LoginVO> adminLogin(@RequestBody AdminLoginDTO adminLoginDTO) {
+        String username = adminLoginDTO.getUsername();
+        String password = adminLoginDTO.getPassword();
+        log.info("管理员尝试登录: {}", username);
+
+        if (StrUtil.hasBlank(username, password)) {
+            return Result.error("用户名或密码不能为空");
+        }
+
+        // 1. 查询用户
+        AuthUser authUser = authUserService.getOne(
+                new LambdaQueryWrapper<AuthUser>().eq(AuthUser::getUserName, username)
+        );
+
+        if (ObjectUtil.isNull(authUser)) {
+            return Result.error("用户名或密码错误");
+        }
+        
+        // 2. 校验密码
+        String encryptedPassword = SaSecureUtil.md5(password);
+        if (!encryptedPassword.equals(authUser.getPassword())) {
+            return Result.error("用户名或密码错误");
+        }
+
+        // 3. 检查用户状态
+        if (authUser.getStatus() != 0 || authUser.getIsDeleted() != 0) {
+            return Result.error("账户已被禁用或注销");
+        }
+        
+        // 4. 登录并校验角色
+        StpUtil.login(authUser.getId());
+        try {
+            StpUtil.checkRole("admin");
+        } catch (Exception e) {
+            StpUtil.logout(); // 权限不足，登出
+            return Result.error("无权访问，仅管理员可登录");
+        }
+
+        String token = StpUtil.getTokenValue();
+        log.info("管理员 {} 登录成功, Token: {}", username, token);
+
+        // 5. 构造VO返回
         LoginVO loginVO = new LoginVO()
                 .setUserId(authUser.getId())
                 .setUserName(authUser.getUserName())

@@ -1,8 +1,6 @@
 package com.jiangying.pojo.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -21,9 +19,20 @@ public class SubjectJudge implements Serializable {
 
     private Long subjectId;
     private Integer isCorrect;
+
+    @TableField(fill = FieldFill.INSERT)
     private String createdBy;
+
+    @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createdTime;
+
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private String updateBy;
+
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
+
+    @TableLogic
+    @TableField(fill = FieldFill.INSERT)
     private Integer isDeleted;
 } 

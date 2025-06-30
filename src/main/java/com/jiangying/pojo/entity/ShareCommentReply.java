@@ -1,5 +1,7 @@
 package com.jiangying.pojo.entity;
 
+import com.baomidou.mybatisplus.annotation.FieldFill;
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
@@ -32,9 +34,19 @@ public class ShareCommentReply implements Serializable {
     private String leafNode;
     private String children;
     private String rootNode;
+
+    @TableField(fill = FieldFill.INSERT)
     private String createdBy;
+
+    @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createdTime;
+
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private String updateBy;
+
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
+
+    @TableField(fill = FieldFill.INSERT)
     private Integer isDeleted;
 } 

@@ -111,7 +111,6 @@ public class CallBackController {
         if (ObjectUtil.isNotNull(authUser)) {
             // 用户重新关注，更新状态
             authUser.setStatus(0); // 0-启用
-            authUser.setUpdateTime(LocalDateTime.now());
             authUserService.updateById(authUser);
             log.info("用户 {} 重新关注", openId);
         } else {
@@ -120,10 +119,7 @@ public class CallBackController {
                     .setUserName(openId) // 使用 OpenID 作为唯一用户名
                     .setNickName("电科小子_" + RandomUtil.randomString(6))
                     .setAvatar("https://tse3-mm.cn.bing.net/th/id/OIP-C.7GLMYPqMlt2LgkbPsOnDIAAAAA?rs=1&pid=ImgDetMain")
-                    .setStatus(0) // 0-启用
-                    .setIsDeleted(0)
-                    .setCreatedTime(LocalDateTime.now())
-                    .setUpdateTime(LocalDateTime.now());
+                    .setStatus(0); // 0-启用
             authUserService.save(newUser);
             log.info("新用户 {} 关注成功, ID: {}", openId, newUser.getId());
             // 分配默认角色
@@ -132,8 +128,6 @@ public class CallBackController {
                 AuthUserRole authUserRole = new AuthUserRole();
                 authUserRole.setUserId(newUser.getId());
                 authUserRole.setRoleId(defaultRole.getId());
-                authUserRole.setCreatedTime(LocalDateTime.now());
-                authUserRole.setUpdateTime(LocalDateTime.now());
                 authUserRoleService.save(authUserRole);
                 log.info("为新用户 {} 分配默认角色 {}", openId, defaultRole.getRoleName());
             } else {
@@ -146,7 +140,6 @@ public class CallBackController {
         AuthUser authUser = authUserService.getOne(new LambdaQueryWrapper<AuthUser>().eq(AuthUser::getUserName, openId));
         if (ObjectUtil.isNotNull(authUser)) {
             authUser.setStatus(1); // 1-禁用
-            authUser.setUpdateTime(LocalDateTime.now());
             authUserService.updateById(authUser);
         }
     }

@@ -1,13 +1,11 @@
 package com.jiangying.pojo.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.io.Serializable;
-import java.sql.Timestamp;
+import java.time.LocalDateTime;
 
 @Data
 @Accessors(chain = true)
@@ -17,15 +15,25 @@ public class InterviewHistory implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @TableId(value = "id", type = IdType.AUTO)
-    private Integer id;
+    private Long id;
 
-    private Double avgScore;
-    private String keyWords;
-    private String tip;
-    private String interviewUrl;
+    private String topic;
+    private String summary;
+    private String evaluation;
+    private Integer score;
+
+    @TableField(fill = FieldFill.INSERT)
     private String createdBy;
-    private Timestamp createdTime;
+
+    @TableField(fill = FieldFill.INSERT)
+    private LocalDateTime createdTime;
+
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private String updateBy;
-    private Timestamp updateTime;
+
+    @TableField(fill = FieldFill.INSERT_UPDATE)
+    private LocalDateTime updateTime;
+
+    @TableField(fill = FieldFill.INSERT)
     private Integer isDeleted;
 } 

@@ -1,8 +1,6 @@
 package com.jiangying.pojo.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
+import com.baomidou.mybatisplus.annotation.*;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -24,9 +22,19 @@ public class PracticeDetail implements Serializable {
     private Integer subjectType;
     private Integer answerStatus;
     private String answerContent;
+
+    @TableField(fill = FieldFill.INSERT)
     private String createdBy;
+
+    @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createdTime;
+
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private String updateBy;
+
+    @TableField(fill = FieldFill.INSERT_UPDATE)
     private LocalDateTime updateTime;
+
+    @TableField(fill = FieldFill.INSERT)
     private Integer isDeleted;
 } 
